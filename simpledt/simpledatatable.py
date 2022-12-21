@@ -131,7 +131,8 @@ class SQLDataTable(BaseDataTable):
         self,
         sql_engine: Literal["sqlite", "mysql", "postgresql"],
         database: str,
-        table: str,
+        table: str = None,
+        statement: str = None,
         user: str = None,
         password: str = None,
         host: str = None,
@@ -140,13 +141,13 @@ class SQLDataTable(BaseDataTable):
         self.sql_engine = sql_engine
         self.database = database
         self.table = table
+        self.statement = statement
         self.user = user
         self.password = password
         self.host = host
         self.port = port
 
         self.__engine = self.__create_engine()
-
         self._set_attrs()
 
     def __create_engine(self):
@@ -167,4 +168,9 @@ class SQLDataTable(BaseDataTable):
 
     @property
     def _df(self) -> pd.DataFrame:
-        return pd.read_sql_table(self.table, self.__engine)
+        if all([self.table, self.statement]):
+            raise Exception("You can only use one, table or statement")
+        elif self.table and not self.statement:
+            return pd.read_sql_table(self.table, self.__engine)
+        elif self.statement and not self.table:
+            return pd.read_sql_query(self.statement, self.__engine)
