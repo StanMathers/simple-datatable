@@ -12,13 +12,7 @@ Note: Publishing this package on PyPi is not planned yet, so you need to clone t
 1. Clone the repository into your project directory
 
     ```bash
-    git clone https://github.com/StanMathers/simple-datatable .
-    ```
-
-2. Install required packages
-
-    ```bash
-    pip3 install -r requirements.txt
+    pip install simpledatatable
     ```
 
 And you're good to go!
@@ -112,11 +106,17 @@ After initializing any of the classes, the following attributes are available
 * **datacolumns** - is a list of serialized **DataColumn** instance included in **datatable** attribute
 
 
-# Classes
+# General class
 
-* **BaseDataTable()**
-    
-    Implements AbstractDataTable and is a parent class of all the other classess. BaseDataTable ensures setting up **datatable**, **datacolumns** and **datarows** which are common among other classes, so all its attributes are available among child classes.
+
+* **DataFrame(source: pd.DataFrame | IO)**
+
+    DataFrame is a general class to serialize and display `pandas dataframe`. It can also serialize any type of file, like CSV, Json, Excel or SQL, but it's not recommended to directly pass names of those files. Insted, create your own `pandas dataframe` and pass it to `DataFrame` object as a `source` argument.
+
+# Shortcut classes
+
+
+If you don't want to initialize your own `pandas dataframe`, you can use `shortcut classes`.
 
 * **CSVDataTable(csv_file: str)**
 
@@ -130,17 +130,21 @@ After initializing any of the classes, the following attributes are available
 
     Takes a Json file as an argument for serialization
 
-* **SQLDataTable(sql_engine: str, database: str, table: str, user: str = None, password: str = None, host: str = None, port: int = None)**
+* **SQLDataTable(sql_engine: str, database: str, table: str = None, statement: str = None user: str = None, password: str = None, host: str = None, port: int = None)**
 
     Takes a SQL database details as an argument for serialization
     
     Required arguments
     * sql_engine is a literal which can be **sqlite, mysql, postgresql**
     * database is a database file, like **data.sqlite3**
-    * table is a SQL table which must be serialized
+
+    `Note:` You can provide one of the two arguments `table` or `statement`.
     
+    * If `table` is provided, then every record from `table` is displayed
+    * If you're comfortable with sql, you can write your own sql `statement`
+
     As for optional arguments, according to your choice of SQL, you can provide the following arguments
-    
+
     * user
     * password
     * host
