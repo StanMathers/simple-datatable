@@ -1,1 +1,1 @@
-from simpledt.simpledatatable import CSVDataTable, ExcelDataTable, JsonDataTable, SQLDataTable
+from simpledt.simpledatatable import CSVDataTable, ExcelDataTable, JsonDataTable, SQLDataTable, DataFrame
