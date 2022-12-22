@@ -157,7 +157,9 @@ class SQLDataTable(BaseDataTable):
         self.port = port
 
         self.__engine = self.__create_engine()
-        self._set_attrs()
+        
+        if any([self.table, self.statement]):
+            self._set_attrs()
 
     def __create_engine(self):
         if self.sql_engine == "sqlite":
