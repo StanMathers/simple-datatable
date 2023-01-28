@@ -15,7 +15,7 @@ classifiers = [
  
 setup(
   name='simpledatatable',
-  version='0.3.3',
+  version='0.3.4',
   description='This package allows flet developers to easily import SQL, CSV, Excel or Json tables into flet\'s DataTable.',
   long_description=long_description,
   url='https://github.com/StanMathers/simple-datatable',

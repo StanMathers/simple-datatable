@@ -72,8 +72,9 @@ class AbstractDataTable(ABC):
 
 
 class BaseDataTable(AbstractDataTable):
-    def __init__(self, filename: str) -> None:
+    def __init__(self, filename: str, **kwargs) -> None:
         self.filename = filename
+        self.kwargs = kwargs
         self._set_attrs()
 
     def _set_attrs(self) -> None:
@@ -94,7 +95,7 @@ class BaseDataTable(AbstractDataTable):
 
     @property
     def _df(self) -> pd.DataFrame:
-        return pd.read_csv(self.filename)
+        return pd.read_csv(self.filename, **self.kwargs)
 
     @property
     def _cols(self) -> List[str]:
@@ -106,33 +107,36 @@ class BaseDataTable(AbstractDataTable):
 
 
 class CSVDataTable(BaseDataTable):
-    def __init__(self, csv_file: str) -> None:
+    def __init__(self, csv_file: str, **kwargs) -> None:
         self.csv_file = csv_file
+        self.kwargs = kwargs
         self._set_attrs()
 
     @property
     def _df(self) -> pd.DataFrame:
-        return pd.read_csv(self.csv_file)
+        return pd.read_csv(self.csv_file, **self.kwargs)
 
 
 class ExcelDataTable(BaseDataTable):
-    def __init__(self, excel_file: str) -> None:
+    def __init__(self, excel_file: str, **kwargs) -> None:
         self.excel_file = excel_file
+        self.kwargs = kwargs
         self._set_attrs()
 
     @property
     def _df(self) -> pd.DataFrame:
-        return pd.read_excel(self.excel_file)
+        return pd.read_excel(self.excel_file, **self.kwargs)
 
 
 class JsonDataTable(BaseDataTable):
-    def __init__(self, json_file: str) -> None:
+    def __init__(self, json_file: str, **kwargs) -> None:
         self.json_file = json_file
+        self.kwargs = kwargs
         self._set_attrs()
 
     @property
     def _df(self) -> pd.DataFrame:
-        return pd.read_json(self.json_file)
+        return pd.read_json(self.json_file, **self.kwargs)
 
 
 class SQLDataTable(BaseDataTable):
@@ -146,6 +150,7 @@ class SQLDataTable(BaseDataTable):
         password: str = None,
         host: str = None,
         port: str = None,
+        **kwargs,
     ) -> None:
         self.sql_engine = sql_engine
         self.database = database
@@ -155,9 +160,10 @@ class SQLDataTable(BaseDataTable):
         self.password = password
         self.host = host
         self.port = port
+        self.kwargs = kwargs
 
         self.__engine = self.__create_engine()
-        
+
         if any([self.table, self.statement]):
             self._set_attrs()
 
@@ -182,35 +188,36 @@ class SQLDataTable(BaseDataTable):
         if all([self.table, self.statement]):
             raise Exception("You can only use one, table or statement")
         elif self.table and not self.statement:
-            return pd.read_sql_table(self.table, self.__engine)
+            return pd.read_sql_table(self.table, self.__engine, **self.kwargs)
         elif self.statement and not self.table:
-            return pd.read_sql_query(self.statement, self.__engine)
+            return pd.read_sql_query(self.statement, self.__engine, **self.kwargs)
 
 
 class DataFrame(BaseDataTable):
     """
     `DataFrame` class is a wrapper for `pandas.DataFrame`. It can display a `pandas.DataFrame` in a `flet's DataTable`.\n
     DataFrame class can also read data from any file, like Json, CSV, Excel...\n
-    
+
     Note: It's recommended to pass your own pandas dataframe to the source parameter, since it can avoid potential bugs.\n
 
     Parameters:\n
         - `source` is the source of the data. It can be a pandas.DataFrame or a file, like Json, CSV, Excel...\n
         - `kwargs` are the arguments that will be passed to pandas.read_table() if `source is not a pandas dataframe.`
             For more information about kwargs, check the pandas documentation https://pandas.pydata.org/docs/reference/api/pandas.read_table.html#pandas.read_table\n
-        
+
     Example:\n
-    
+
     def main(page: ft.Page):
         df = pd.read_excel('dataset/Excel_MOCK_DATA.xlsx')
-        
+
         table = DataFrame(df)
-        
+
         dt = table.datatable
-        
+
         page.add(dt)
-    
+
     """
+
     def __init__(self, source: Union[pd.DataFrame, IO], **kwargs) -> None:
         self.source = source
         self.kwargs = kwargs
